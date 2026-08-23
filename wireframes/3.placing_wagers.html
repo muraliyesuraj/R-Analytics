@@ -1,0 +1,126 @@
+<div style="background-color: #0b0f17; color: #f8fafc; font-family: system-ui, sans-serif; max-width: 380px; border: 1px solid #334155; border-radius: 12px; padding: 12px; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);">
+  
+  <!-- App Status & Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 6px; margin-bottom: 8px;">
+    <div>
+      <span style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">BELLAGIO TABLE #4</span>
+      <span style="font-size: 8px; color: #64748b; display: block;">BANKROLL: <strong style="color:#10b981;">$200.00</strong></span>
+    </div>
+    <div style="background-color: #1e293b; border-radius: 4px; padding: 2px 6px; font-size: 8px; color: #10b981; font-weight: 700;">EUROPEAN (0)</div>
+  </div>
+
+  <!-- STEP 3 ACTIVE WAGER TALLY BANNER -->
+  <div style="background: #020617; border: 1px solid #10b981; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <span style="font-size: 8px; font-weight: 800; color: #94a3b8; display: block;">ACTIVE ROUND WAGER</span>
+      <span style="font-size: 14px; font-weight: 900; color: #10b981;">$15.00</span>
+    </div>
+    <div style="text-align: right;">
+      <span style="font-size: 8px; font-weight: 700; color: #38bdf8; display: block;">3 CHIPS PLACED</span>
+      <span style="font-size: 7px; color: #64748b;">(Straight, Split, Corner)</span>
+    </div>
+  </div>
+
+  <!-- Main Workspace: Vertical Table Grid with Active Chips -->
+  <div style="background-color: #076324; border: 2px solid #f59e0b; border-radius: 6px; padding: 6px; display: grid; grid-template-columns: 1fr 1fr 1fr 32px; gap: 3px; font-size: 11px; font-weight: 800; text-align: center; margin-bottom: 8px; position: relative;">
+    
+    <!-- Top Row: Zero Block -->
+    <div style="grid-column: 1 / span 3; background: #059669; color: white; padding: 6px 0; border-radius: 3px; border: 1px solid #10b981;">0</div>
+    <div style="background: #047857; font-size: 7px; padding: 6px 0; color: #cbd5e1;">COL</div>
+
+    <!-- Rows 1 to 5 (Simplified for space view) -->
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">1</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">2</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">3</div>
+    <div style="grid-row: span 4; background:#047857; font-size:8px; display:flex; align-items:center; justify-content:center; writing-mode: vertical-lr;">1st 12</div>
+
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">4</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">5</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">6</div>
+
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">7</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">8</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">9</div>
+
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">10</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">11</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">12</div>
+
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">13</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">14</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">15</div>
+    <div style="grid-row: span 4; background:#047857; font-size:8px; display:flex; align-items:center; justify-content:center; writing-mode: vertical-lr;">2nd 12</div>
+
+    <!-- Active Row 6: #16, #17, #18 (Focus Area) -->
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">16</div>
+    
+    <!-- STRAIGHT UP CHIP ON #17 -->
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px; position: relative;">
+      17
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #dc2626; color: white; font-size: 8px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #f59e0b; box-shadow: 0 0 6px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;">5</div>
+    </div>
+    
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px; position: relative;">
+      18
+      <!-- CORNER CHIP ON #17/18/20/21 INTERSECTION -->
+      <div style="position: absolute; bottom: -8px; left: -8px; background: #dc2626; color: white; font-size: 8px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #f59e0b; z-index: 10; box-shadow: 0 0 6px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;">5</div>
+    </div>
+
+    <!-- Active Row 7: #19, #20, #21 (Focus Area) -->
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">19</div>
+    
+    <!-- SPLIT CHIP ON #17/#20 BORDER -->
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px; position: relative;">
+      20
+      <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 8px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #f59e0b; z-index: 10; box-shadow: 0 0 6px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;">5</div>
+    </div>
+    
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">21</div>
+
+    <!-- Remaining Rows 8 to 12 -->
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">22</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">23</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">24</div>
+
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">25</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">26</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">27</div>
+    <div style="grid-row: span 4; background:#047857; font-size:8px; display:flex; align-items:center; justify-content:center; writing-mode: vertical-lr;">3rd 12</div>
+
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">28</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">29</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">30</div>
+
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">31</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">32</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">33</div>
+
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">34</div>
+    <div style="background:#1e293b; padding:6px 0; border-radius:2px;">35</div>
+    <div style="background:#dc2626; padding:6px 0; border-radius:2px;">36</div>
+
+    <!-- Column Totals -->
+    <div style="background:#047857; font-size:8px; padding:4px 0;">2:1</div>
+    <div style="background:#047857; font-size:8px; padding:4px 0;">2:1</div>
+    <div style="background:#047857; font-size:8px; padding:4px 0;">2:1</div>
+    <div style="background:#034e38;"></div>
+
+    <!-- Bottom Outside Bets Bar -->
+    <div style="grid-column: 1 / span 4; display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-top: 2px;">
+      <div style="background:#065f46; padding:4px 0; font-size:7px;">1-18</div>
+      <div style="background:#065f46; padding:4px 0; font-size:7px;">EVEN</div>
+      <div style="background:#dc2626; padding:4px 0; font-size:7px;">RED</div>
+      <div style="background:#1e293b; padding:4px 0; font-size:7px;">BLK</div>
+      <div style="background:#065f46; padding:4px 0; font-size:7px;">ODD</div>
+      <div style="background:#065f46; padding:4px 0; font-size:7px;">19-36</div>
+    </div>
+  </div>
+
+  <!-- Bottom Action Dock (Now Unlocked & Interactive) -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 6px;">
+    <button style="background: #1e293b; color: #ef4444; border: 1px solid #ef4444; padding: 8px 0; border-radius: 4px; font-size: 8px; font-weight: 800; cursor: pointer;">CLEAR</button>
+    <button style="background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; padding: 8px 0; border-radius: 4px; font-size: 8px; font-weight: 800; cursor: pointer;">REPEAT</button>
+    <button style="background: #10b981; color: #020617; border: none; padding: 8px 0; border-radius: 4px; font-size: 9px; font-weight: 900; cursor: pointer; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);">SUBMIT SPIN</button>
+  </div>
+
+</div>

@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Roulette Analytics",
+    "slug": "roulette-analytics",
+    "version": "0.1.0",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.rouletteanalytics.app"
+    },
+    "android": {
+      "package": "com.rouletteanalytics.app"
+    },
+    "scheme": "roulette-analytics"
+  }
+}
