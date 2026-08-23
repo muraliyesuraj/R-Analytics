@@ -5,6 +5,7 @@ import WheelGrid from '../components/WheelGrid';
 import Analytics from '../components/Analytics';
 import AddTableModal from '../components/AddTableModal';
 import { calculateMetrics } from '../utils/wheelUtils';
+import { calculatePayout } from '../utils/payoutUtils';
 
 interface ActiveScreenProps {
   tables: Table[];
@@ -29,8 +30,9 @@ function ActiveScreen({
 }: ActiveScreenProps) {
   const [showAddTable, setShowAddTable] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(true);
-  const [selectedNumbersForChip, setSelectedNumbersForChip] = useState<number[]>([]);
   const [chipAmount, setChipAmount] = useState<number>(5);
+  const [activeBets, setActiveBets] = useState<Record<string, number>>({});
+  const [winningNumber, setWinningNumber] = useState<number | null>(null);
 
   const currentTable = tables.find((t) => t.id === currentTableId);
   if (!currentTable) return null;
@@ -42,23 +44,21 @@ function ActiveScreen({
   );
   const totalSpins = tables.reduce((sum, t) => sum + t.spins.length, 0);
 
-  const handleSelectNumber = (number: number) => {
-    if (selectedNumbersForChip.includes(number)) {
-      setSelectedNumbersForChip(selectedNumbersForChip.filter((n) => n !== number));
-    } else {
-      setSelectedNumbersForChip([...selectedNumbersForChip, number]);
-    }
+  const handleSelectWinningNumber = (num: number) => {
+    setWinningNumber(num);
   };
 
   const handleSubmitSpin = () => {
-    if (selectedNumbersForChip.length === 0) {
-      alert('Select a number first');
-      return;
-    }
-    const spinNumber = selectedNumbersForChip[0];
-    onAddSpin(currentTableId, spinNumber);
-    // Update bankroll based on chip bets (simplified - just track the spin)
-    setSelectedNumbersForChip([]);
+    if (winningNumber === null) return;
+
+    const netProfitOrLoss = calculatePayout(activeBets, winningNumber);
+
+    onUpdateBankroll(currentTableId, currentTable.currentBankroll + netProfitOrLoss);
+
+    onAddSpin(currentTableId, winningNumber);
+
+    setWinningNumber(null);
+    setActiveBets({});
   };
 
   return (
@@ -147,10 +147,10 @@ function ActiveScreen({
         />
       )}
 
-      {/* Active Chip Selector Dock */}
+      {/* Chip Selector Dock */}
       <div className="bg-[#020617] border border-[#38bdf8] rounded-lg p-3 mx-1">
         <div className="flex justify-between items-center mb-3">
-          <span className="text-[8px] font-black text-[#38bdf8]">ACTIVE CHIP</span>
+          <span className="text-[8px] font-black text-[#38bdf8]">SELECT CHIP VALUE TO PLACE</span>
           <span className="text-[8px] font-bold text-[#f59e0b]">SELECTED: ${chipAmount}</span>
         </div>
         <div className="flex justify-around items-center gap-1">
@@ -184,28 +184,45 @@ function ActiveScreen({
         </div>
       </div>
 
-      {/* Main Wheel Grid Board */}
+      {/* Betting Board Layout */}
       <div className="bg-[#020617] border border-[#1e293b] rounded-lg p-2">
         <p className="text-[8px] font-black text-[#94a3b8] mb-2 tracking-wide px-1">
-          LOG SPIN RESULT
+          STEP 1: PLACE YOUR BETS ON THE FELT
         </p>
         <WheelGrid
-          selectedNumbers={selectedNumbersForChip}
-          onSelectNumber={handleSelectNumber}
+          selectedNumbers={[]}
+          onSelectNumber={handleSelectWinningNumber}
           recentSpins={currentTable.spins.slice(-10)}
           activeChipValue={chipAmount}
+          onBetsChange={setActiveBets}
         />
       </div>
 
-      {/* Submit Spin Button */}
-      <div className="px-1">
-        <button
-          onClick={handleSubmitSpin}
-          className="w-full bg-[#10b981] text-[#020617] py-2.5 rounded-lg text-[10px] font-black hover:bg-[#059669] transition-colors glow-green disabled:opacity-50 cursor-pointer"
-          disabled={selectedNumbersForChip.length === 0}
-        >
-          SUBMIT SPIN RESULT
-        </button>
+      {/* Winning Number Declaration & Submit Panel */}
+      <div className="bg-[#020617] border-2 border-[#10b981] rounded-lg p-3 mx-1 space-y-2">
+        <p className="text-[8px] font-black text-[#10b981] tracking-wide uppercase">
+          STEP 2: DECLARE WINNING NUMBER & RECORD SPIN
+        </p>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min="0"
+            max="36"
+            placeholder="Winning # (0-36)"
+            value={winningNumber !== null ? winningNumber : ''}
+            onChange={(e) => setWinningNumber(e.target.value !== '' ? parseInt(e.target.value, 10) : null)}
+            className="flex-1 bg-[#0f172a] border border-[#334155] rounded px-3 py-2 text-white font-bold text-xs focus:outline-none focus:border-[#10b981]"
+          />
+
+          <button
+            onClick={handleSubmitSpin}
+            disabled={winningNumber === null}
+            className="bg-[#10b981] text-[#020617] px-4 py-2 rounded font-black text-xs hover:bg-[#059669] disabled:opacity-40 cursor-pointer transition-colors"
+          >
+            {winningNumber !== null ? `LOG OUTCOME (#${winningNumber})` : 'ENTER RESULT'}
+          </button>
+        </div>
       </div>
 
       {/* Analytics Accordion */}
@@ -219,7 +236,7 @@ function ActiveScreen({
         {showAnalytics && <Analytics metrics={metrics} totalSpins={currentTable.spins.length} />}
       </div>
 
-      {/* Recent Spins Horizontal History */}
+      {/* Recent Spins History */}
       {currentTable.spins.length > 0 && (
         <div className="bg-[#020617] border border-[#1e293b] rounded-lg p-3 mx-1">
           <p className="text-[8px] font-black text-[#94a3b8] mb-2 tracking-wide">

@@ -25,10 +25,10 @@ const VERTICAL_ROWS = [
   [34, 35, 36],
 ];
 
-// Display-only PlacedChip overlay to prevent accidental deletion clicks
+// Display-only PlacedChip overlay
 const PlacedChip = ({ amount }: { amount: number }) => (
-  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#f59e0b] border border-dashed border-white shadow-[0_0_8px_rgba(0,0,0,0.9)] flex items-center justify-center z-30 pointer-events-none">
-    <span className="text-[7px] font-black text-[#020617]">${amount}</span>
+  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#f59e0b] border border-dashed border-white shadow-[0_0_8px_rgba(0,0,0,0.9)] flex items-center justify-center z-30 pointer-events-none">
+    <span className="text-[6px] font-black text-[#020617]">${amount}</span>
   </div>
 );
 
@@ -43,7 +43,7 @@ function WheelGrid({ selectedNumbers, onSelectNumber, recentSpins, activeChipVal
     }
   };
 
-  // Add chip on left click
+  // Add chip on click
   const handlePlaceBet = (betId: string, e?: React.MouseEvent, numValue?: number) => {
     if (e) e.preventDefault();
     
@@ -59,7 +59,7 @@ function WheelGrid({ selectedNumbers, onSelectNumber, recentSpins, activeChipVal
     }
   };
 
-  // Subtract chip on right click
+  // Subtract chip on right-click
   const handleRemoveBet = (betId: string, e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -77,7 +77,6 @@ function WheelGrid({ selectedNumbers, onSelectNumber, recentSpins, activeChipVal
     }
   };
 
-  // Undo action
   const handleUndo = () => {
     if (history.length === 0) return;
     const previousBets = history[history.length - 1];
@@ -85,14 +84,12 @@ function WheelGrid({ selectedNumbers, onSelectNumber, recentSpins, activeChipVal
     setHistory((prev) => prev.slice(0, -1));
   };
 
-  // Clear all bets
   const clearAllBets = () => {
     if (Object.keys(bets).length === 0) return;
     setHistory((prev) => [...prev, bets]);
     updateBetsState({});
   };
 
-  // Double active bets (2x)
   const handleDoubleBets = () => {
     if (Object.keys(bets).length === 0) return;
     setHistory((prev) => [...prev, bets]);
@@ -121,81 +118,97 @@ function WheelGrid({ selectedNumbers, onSelectNumber, recentSpins, activeChipVal
           {bets['num-0'] && <PlacedChip amount={bets['num-0']} />}
         </button>
 
-        {/* BOARD GRID */}
+        {/* BOARD GRID WITH ALL INTERSECTION DOTS */}
         <div className="grid grid-cols-4 gap-1 mb-2">
           
-          <div className="col-span-3 border border-[#10b981]/40 rounded-b-md overflow-hidden bg-[#047857]/20">
-            {VERTICAL_ROWS.map((row, rowIdx) => (
-              <div key={rowIdx} className="grid grid-cols-3 gap-0 relative">
-                {row.map((num, colIdx) => {
-                  const betId = `num-${num}`;
-                  const betAmount = bets[betId];
-                  const bgColor = getNumberColor(num);
+          <div className="col-span-3 border border-[#10b981]/40 rounded-b-md overflow-hidden bg-[#047857]/20 pl-4">
+            {VERTICAL_ROWS.map((row, rowIdx) => {
+              const streetId = `street-${row[0]}-${row[2]}`;
 
-                  const horizSplitId = `split-h-${num}-${num + 1}`;
-                  const vertSplitId = `split-v-${num}-${num + 3}`;
-                  const cornerId = `corner-${num}-${num + 1}-${num + 3}-${num + 4}`;
+              return (
+                <div key={rowIdx} className="grid grid-cols-3 gap-0 relative">
+                  
+                  {/* 🟢 STREET LINE DOT (In front of each line: e.g. 1, 2, 3) */}
+                  <button
+                    onClick={(e) => handlePlaceBet(streetId, e)}
+                    onContextMenu={(e) => handleRemoveBet(streetId, e)}
+                    className="absolute -left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 z-30 cursor-pointer flex items-center justify-center group"
+                    title={`Street Bet (Line ${row[0]}-${row[2]})`}
+                  >
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_4px_#f59e0b] group-hover:scale-125 transition-all border border-black/60" />
+                    {bets[streetId] && <PlacedChip amount={bets[streetId]} />}
+                  </button>
 
-                  return (
-                    <div key={num} className="relative h-9 w-full border-[0.5px] border-[#10b981]/30">
-                      
-                      {/* Straight Up Number Button */}
-                      <button
-                        onClick={(e) => handlePlaceBet(betId, e, num)}
-                        onContextMenu={(e) => handleRemoveBet(betId, e)}
-                        className="h-full w-full font-bold text-xs flex items-center justify-center transition-all cursor-pointer relative"
-                        style={{
-                          backgroundColor: bgColor,
-                          boxShadow: betAmount ? 'inset 0 0 0 2px #f59e0b' : 'none',
-                        }}
-                      >
-                        <span className="text-white font-bold">{num}</span>
-                        {betAmount && <PlacedChip amount={betAmount} />}
-                      </button>
+                  {row.map((num, colIdx) => {
+                    const betId = `num-${num}`;
+                    const betAmount = bets[betId];
+                    const bgColor = getNumberColor(num);
 
-                      {/* Horizontal Split Target */}
-                      {colIdx < 2 && (
+                    const horizSplitId = `split-h-${num}-${num + 1}`;
+                    const vertSplitId = `split-v-${num}-${num + 3}`;
+                    const cornerId = `corner-${num}-${num + 1}-${num + 3}-${num + 4}`;
+
+                    return (
+                      <div key={num} className="relative h-9 w-full border-[0.5px] border-[#10b981]/30">
+                        
+                        {/* Straight-Up Number Target */}
                         <button
-                          onClick={(e) => handlePlaceBet(horizSplitId, e)}
-                          onContextMenu={(e) => handleRemoveBet(horizSplitId, e)}
-                          className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-6 z-20 cursor-pointer flex items-center justify-center group"
-                          title={`Split ${num}-${num + 1}`}
+                          onClick={(e) => handlePlaceBet(betId, e, num)}
+                          onContextMenu={(e) => handleRemoveBet(betId, e)}
+                          className="h-full w-full font-bold text-xs flex items-center justify-center transition-all cursor-pointer relative"
+                          style={{
+                            backgroundColor: bgColor,
+                            boxShadow: betAmount ? 'inset 0 0 0 2px #f59e0b' : 'none',
+                          }}
                         >
-                          <div className="w-2 h-2 rounded-full bg-[#f59e0b]/40 group-hover:bg-[#f59e0b] group-hover:scale-125 transition-all" />
-                          {bets[horizSplitId] && <PlacedChip amount={bets[horizSplitId]} />}
+                          <span className="text-white font-bold">{num}</span>
+                          {betAmount && <PlacedChip amount={betAmount} />}
                         </button>
-                      )}
 
-                      {/* Vertical Split Target */}
-                      {rowIdx < 11 && (
-                        <button
-                          onClick={(e) => handlePlaceBet(vertSplitId, e)}
-                          onContextMenu={(e) => handleRemoveBet(vertSplitId, e)}
-                          className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-4 w-6 z-20 cursor-pointer flex items-center justify-center group"
-                          title={`Split ${num}-${num + 3}`}
-                        >
-                          <div className="w-2 h-2 rounded-full bg-[#f59e0b]/40 group-hover:bg-[#f59e0b] group-hover:scale-125 transition-all" />
-                          {bets[vertSplitId] && <PlacedChip amount={bets[vertSplitId]} />}
-                        </button>
-                      )}
+                        {/* Horizontal Split Target Dot */}
+                        {colIdx < 2 && (
+                          <button
+                            onClick={(e) => handlePlaceBet(horizSplitId, e)}
+                            onContextMenu={(e) => handleRemoveBet(horizSplitId, e)}
+                            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-6 z-20 cursor-pointer flex items-center justify-center group"
+                            title={`Split ${num}-${num + 1}`}
+                          >
+                            <div className="w-2 h-2 rounded-full bg-[#f59e0b]/60 group-hover:bg-[#f59e0b] group-hover:scale-125 transition-all border border-black/40" />
+                            {bets[horizSplitId] && <PlacedChip amount={bets[horizSplitId]} />}
+                          </button>
+                        )}
 
-                      {/* Corner Intersection Target */}
-                      {colIdx < 2 && rowIdx < 11 && (
-                        <button
-                          onClick={(e) => handlePlaceBet(cornerId, e)}
-                          onContextMenu={(e) => handleRemoveBet(cornerId, e)}
-                          className="absolute -bottom-2 -right-2 w-4 h-4 z-30 cursor-pointer flex items-center justify-center group"
-                          title={`Corner ${num}, ${num + 1}, ${num + 3}, ${num + 4}`}
-                        >
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_4px_#f59e0b] group-hover:scale-150 transition-all border border-black/40" />
-                          {bets[cornerId] && <PlacedChip amount={bets[cornerId]} />}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+                        {/* Vertical Split Target Dot */}
+                        {rowIdx < 11 && (
+                          <button
+                            onClick={(e) => handlePlaceBet(vertSplitId, e)}
+                            onContextMenu={(e) => handleRemoveBet(vertSplitId, e)}
+                            className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-4 w-6 z-20 cursor-pointer flex items-center justify-center group"
+                            title={`Split ${num}-${num + 3}`}
+                          >
+                            <div className="w-2 h-2 rounded-full bg-[#f59e0b]/60 group-hover:bg-[#f59e0b] group-hover:scale-125 transition-all border border-black/40" />
+                            {bets[vertSplitId] && <PlacedChip amount={bets[vertSplitId]} />}
+                          </button>
+                        )}
+
+                        {/* Corner Intersection Target Dot (4 Numbers) */}
+                        {colIdx < 2 && rowIdx < 11 && (
+                          <button
+                            onClick={(e) => handlePlaceBet(cornerId, e)}
+                            onContextMenu={(e) => handleRemoveBet(cornerId, e)}
+                            className="absolute -bottom-2 -right-2 w-4 h-4 z-30 cursor-pointer flex items-center justify-center group"
+                            title={`Corner ${num}, ${num + 1}, ${num + 3}, ${num + 4}`}
+                          >
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_4px_#f59e0b] group-hover:scale-150 transition-all border border-black/40" />
+                            {bets[cornerId] && <PlacedChip amount={bets[cornerId]} />}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
 
           {/* VERTICAL DOZENS SIDEBAR */}
@@ -306,7 +319,7 @@ function WheelGrid({ selectedNumbers, onSelectNumber, recentSpins, activeChipVal
           </div>
         </div>
 
-        {/* BET CONTROLS ACTION BAR */}
+        {/* BET CONTROLS BAR */}
         <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-[#10b981]/30">
           <button
             onClick={handleUndo}
