@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { AppState, Session, Table, Spin, WheelType } from './types/index';
+import { AppState, Session, Table, WheelType } from './types/index';
 import LaunchScreen from './screens/LaunchScreen';
 import ActiveScreen from './screens/ActiveScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import SummaryScreen from './screens/SummaryScreen';
+import { calculatePayout } from './utils/payoutUtils';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('launch');
@@ -18,10 +19,6 @@ function App() {
       setSessions(JSON.parse(saved));
     }
   }, []);
-
-  const saveToStorage = () => {
-    localStorage.setItem('roulette_sessions', JSON.stringify(sessions));
-  };
 
   const startSession = (tables: Array<{ name: string; wheelType: WheelType; bankroll: number }>) => {
     const sessionId = `session_${Date.now()}`;
@@ -41,26 +38,29 @@ function App() {
     setAppState('active');
   };
 
-  const addSpin = (tableId: string, number: number) => {
-    setCurrentTables(
-      currentTables.map((t) =>
-        t.id === tableId
-          ? {
-              ...t,
-              spins: [...t.spins, { number, timestamp: Date.now() }],
-            }
-          : t
-      )
-    );
-  };
+  // Atomic log spin and bankroll payout calculator
+  const handleLogSpinWithPayout = (
+    tableId: string,
+    winningNumber: number,
+    bets: Record<string, number>
+  ) => {
+    const netProfitOrLoss = calculatePayout(bets, winningNumber);
 
-  const updateBankroll = (tableId: string, amount: number) => {
-    setCurrentTables(
-      currentTables.map((t) =>
-        t.id === tableId
-          ? { ...t, currentBankroll: t.currentBankroll + amount }
-          : t
-      )
+    setCurrentTables((prevTables) =>
+      prevTables.map((t) => {
+        if (t.id !== tableId) return t;
+
+        const newSpin = {
+          number: winningNumber,
+          timestamp: Date.now(),
+        };
+
+        return {
+          ...t,
+          currentBankroll: t.currentBankroll + netProfitOrLoss,
+          spins: [...t.spins, newSpin],
+        };
+      })
     );
   };
 
@@ -74,7 +74,7 @@ function App() {
       spins: [],
       createdAt: Date.now(),
     };
-    setCurrentTables([...currentTables, newTable]);
+    setCurrentTables((prev) => [...prev, newTable]);
     setCurrentTableId(newTable.id);
   };
 
@@ -127,8 +127,7 @@ function App() {
             tables={currentTables}
             currentTableId={currentTableId}
             onSelectTable={setCurrentTableId}
-            onAddSpin={addSpin}
-            onUpdateBankroll={updateBankroll}
+            onLogSpinWithPayout={handleLogSpinWithPayout}
             onAddTable={addTable}
             onCompleteSession={completeSession}
             onGoToHistory={goToHistory}
