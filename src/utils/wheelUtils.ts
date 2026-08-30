@@ -5,7 +5,12 @@ export interface WheelNumber {
   isEven: boolean;
 }
 
-const WHEEL_LAYOUT: Record<number, WheelNumber> = {
+export interface Spin {
+  number: number;
+  timestamp: number;
+}
+
+const WHEEL_PROPERTIES: Record<number, WheelNumber> = {
   0: { color: 'green', range: 'zero', isOdd: false, isEven: true },
   1: { color: 'red', range: 'low', isOdd: true, isEven: false },
   2: { color: 'black', range: 'low', isOdd: false, isEven: true },
@@ -46,7 +51,7 @@ const WHEEL_LAYOUT: Record<number, WheelNumber> = {
 };
 
 export function getWheelNumber(number: number): WheelNumber {
-  return WHEEL_LAYOUT[number] || WHEEL_LAYOUT[0];
+  return WHEEL_PROPERTIES[number] || WHEEL_PROPERTIES[0];
 }
 
 export function getNumberColor(number: number): string {
@@ -54,11 +59,6 @@ export function getNumberColor(number: number): string {
   if (props.color === 'red') return '#dc2626';
   if (props.color === 'black') return '#1e293b';
   return '#059669';
-}
-
-export function getNumberForDisplay(number: number): string {
-  if (number === 0) return '0';
-  return number.toString();
 }
 
 export function calculateMetrics(spins: Spin[]) {
@@ -90,4 +90,3 @@ export function getPercentage(value: number, total: number): string {
   if (total === 0) return '0.0%';
   return ((value / total) * 100).toFixed(1) + '%';
 }
-

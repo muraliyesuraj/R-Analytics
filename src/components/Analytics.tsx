@@ -1,92 +1,86 @@
 import React from 'react';
-import { Metrics } from '../types/index';
+import { getPercentage } from '../utils/wheelUtils';
 
 interface AnalyticsProps {
-  metrics: Metrics;
+  metrics: {
+    redCount: number;
+    blackCount: number;
+    greenCount: number;
+    oddCount: number;
+    evenCount: number;
+    lowCount: number;
+    highCount: number;
+  };
   totalSpins: number;
 }
 
 function Analytics({ metrics, totalSpins }: AnalyticsProps) {
   if (!metrics || totalSpins === 0) {
     return (
-      <div className="bg-[#020617] border border-[#1e293b] rounded-lg p-3 mx-3 text-center text-[9px] text-[#64748b]">
-        No spins logged yet
+      <div className="bg-[#020617] border border-[#1e293b] rounded-lg p-3 mx-1 text-center text-[10px] text-[#64748b]">
+        No spins logged yet. Log an outcome to view live analytics.
       </div>
     );
   }
 
-  // Fallback values to guarantee safety against undefined metrics properties
-  const redCount = metrics.colors?.red || 0;
-  const blackCount = metrics.colors?.black || 0;
-  const greenCount = metrics.colors?.green || 0;
-  
-  const lowCount = metrics.ranges?.low || 0;
-  const highCount = metrics.ranges?.high || 0;
+  const renderBar = (count: number, label: string, barColor: string) => {
+    const percentageVal = totalSpins > 0 ? (count / totalSpins) * 100 : 0;
+    const percentageText = getPercentage(count, totalSpins);
 
-  const getPercentBar = (value: number, total: number) => {
-    const percentage = total > 0 ? (value / total) * 100 : 0;
     return (
-      <div className="flex items-center gap-2">
-        <div className="flex-1 bg-[#0f172a] rounded h-3 overflow-hidden">
-          <div
-            className="bg-[#38bdf8] h-full rounded transition-all"
-            style={{ width: `${Math.min(percentage, 100)}%` }}
-          />
+      <div className="space-y-1">
+        <div className="flex justify-between items-center text-[9px]">
+          <span className="text-[#cbd5e1] font-bold">
+            {label} ({count})
+          </span>
+          <span className="text-[#94a3b8] font-black">{percentageText}</span>
         </div>
-        <div className="text-right text-[8px] font-bold text-[#94a3b8] w-12">
-          {percentage.toFixed(1)}%
+        <div className="w-full bg-[#0f172a] rounded h-2.5 overflow-hidden border border-[#334155]/40">
+          <div
+            className="h-full transition-all duration-300 rounded"
+            style={{
+              width: `${Math.min(percentageVal, 100)}%`,
+              backgroundColor: barColor,
+            }}
+          />
         </div>
       </div>
     );
   };
 
   return (
-    <div className="bg-[#020617] border border-[#1e293b] rounded-lg p-3 mx-3 space-y-4">
-      {/* Colors */}
+    <div className="bg-[#020617] border border-[#1e293b] rounded-lg p-3 mx-1 space-y-4">
+      {/* COLOR DISTRIBUTION */}
       <div>
-        <p className="text-[8px] font-black text-[#94a3b8] mb-2 tracking-wide">
-          COLOR DISTRIBUTION
+        <p className="text-[9px] font-black text-[#38bdf8] mb-2 tracking-wider">
+          COLOR DISTRIBUTION ({totalSpins} SPINS)
         </p>
         <div className="space-y-2">
-          <div>
-            <label className="text-[7px] text-[#cbd5e1] font-bold block mb-1">
-              Red ({redCount})
-            </label>
-            {getPercentBar(redCount, totalSpins)}
-          </div>
-          <div>
-            <label className="text-[7px] text-[#cbd5e1] font-bold block mb-1">
-              Black ({blackCount})
-            </label>
-            {getPercentBar(blackCount, totalSpins)}
-          </div>
-          <div>
-            <label className="text-[7px] text-[#cbd5e1] font-bold block mb-1">
-              Green ({greenCount})
-            </label>
-            {getPercentBar(greenCount, totalSpins)}
-          </div>
+          {renderBar(metrics.redCount || 0, 'Red', '#dc2626')}
+          {renderBar(metrics.blackCount || 0, 'Black', '#3b82f6')}
+          {renderBar(metrics.greenCount || 0, 'Green', '#10b981')}
         </div>
       </div>
 
-      {/* Ranges */}
+      {/* RANGE DISTRIBUTION */}
       <div>
-        <p className="text-[8px] font-black text-[#94a3b8] mb-2 tracking-wide">
+        <p className="text-[9px] font-black text-[#38bdf8] mb-2 tracking-wider">
           RANGE DISTRIBUTION
         </p>
         <div className="space-y-2">
-          <div>
-            <label className="text-[7px] text-[#cbd5e1] font-bold block mb-1">
-              Low 1-18 ({lowCount})
-            </label>
-            {getPercentBar(lowCount, totalSpins)}
-          </div>
-          <div>
-            <label className="text-[7px] text-[#cbd5e1] font-bold block mb-1">
-              High 19-36 ({highCount})
-            </label>
-            {getPercentBar(highCount, totalSpins)}
-          </div>
+          {renderBar(metrics.lowCount || 0, 'Low 1-18', '#f59e0b')}
+          {renderBar(metrics.highCount || 0, 'High 19-36', '#8b5cf6')}
+        </div>
+      </div>
+
+      {/* PARITY DISTRIBUTION */}
+      <div>
+        <p className="text-[9px] font-black text-[#38bdf8] mb-2 tracking-wider">
+          ODD / EVEN DISTRIBUTION
+        </p>
+        <div className="space-y-2">
+          {renderBar(metrics.evenCount || 0, 'Even', '#06b6d4')}
+          {renderBar(metrics.oddCount || 0, 'Odd', '#ec4899')}
         </div>
       </div>
     </div>

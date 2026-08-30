@@ -10,6 +10,7 @@ function App() {
   const [appState, setAppState] = useState<AppState>('launch');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentTables, setCurrentTables] = useState<Table[]>([]);
+  const [completedTables, setCompletedTables] = useState<Table[]>([]); // Track concluded tables
   const [currentTableId, setCurrentTableId] = useState<string | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
@@ -33,6 +34,7 @@ function App() {
     }));
 
     setCurrentTables(newTables);
+    setCompletedTables([]);
     setCurrentSessionId(sessionId);
     setCurrentTableId(newTables[0].id);
     setAppState('active');
@@ -78,19 +80,38 @@ function App() {
     setCurrentTableId(newTable.id);
   };
 
-  const completeSession = () => {
-    if (!currentSessionId || currentTables.length === 0) return;
+  const handleConcludeTable = (tableId: string) => {
+    const tableToConclude = currentTables.find((t) => t.id === tableId);
+    if (!tableToConclude) return;
 
-    const totalSpins = currentTables.reduce((sum, t) => sum + t.spins.length, 0);
-    const netProfit = currentTables.reduce(
+    const remainingTables = currentTables.filter((t) => t.id !== tableId);
+    const updatedCompletedTables = [...completedTables, tableToConclude];
+
+    setCompletedTables(updatedCompletedTables);
+
+    if (remainingTables.length === 0) {
+      // Complete session passing all active + concluded tables
+      completeSession([...updatedCompletedTables]);
+    } else {
+      setCurrentTables(remainingTables);
+      setCurrentTableId(remainingTables[0].id);
+    }
+  };
+
+  const completeSession = (allTablesOverride?: Table[]) => {
+    const allTables = allTablesOverride || [...currentTables, ...completedTables];
+    if (allTables.length === 0) return;
+
+    const totalSpins = allTables.reduce((sum, t) => sum + t.spins.length, 0);
+    const netProfit = allTables.reduce(
       (sum, t) => sum + (t.currentBankroll - t.initialBankroll),
       0
     );
 
     const newSession: Session = {
-      id: currentSessionId,
+      id: currentSessionId || `session_${Date.now()}`,
       date: Date.now(),
-      tables: currentTables,
+      tables: allTables,
       totalSpins,
       netProfit,
       completedAt: Date.now(),
@@ -100,11 +121,14 @@ function App() {
     setSessions(updatedSessions);
     localStorage.setItem('roulette_sessions', JSON.stringify(updatedSessions));
 
+    // Save final tables state for SummaryScreen display
+    setCurrentTables(allTables);
     setAppState('summary');
   };
 
   const startNewSession = () => {
     setCurrentTables([]);
+    setCompletedTables([]);
     setCurrentTableId(null);
     setCurrentSessionId(null);
     setAppState('launch');
@@ -129,14 +153,15 @@ function App() {
             onSelectTable={setCurrentTableId}
             onLogSpinWithPayout={handleLogSpinWithPayout}
             onAddTable={addTable}
-            onCompleteSession={completeSession}
+            onConcludeTable={handleConcludeTable}
+            onCompleteSession={() => completeSession()}
             onGoToHistory={goToHistory}
           />
         )}
         {appState === 'history' && (
           <HistoryScreen sessions={sessions} onBack={goToLaunch} />
         )}
-        {appState === 'summary' && currentSessionId && (
+        {appState === 'summary' && (
           <SummaryScreen
             tables={currentTables}
             onNewSession={startNewSession}
